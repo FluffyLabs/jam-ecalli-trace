@@ -1,6 +1,6 @@
 # JIP-X: PVM Ecalli Trace
 
-TODO: intro
+This JIP describes a text format of the PVM execution Input-Output (ecalli) trace data.
 
 ## Goals
 
@@ -17,14 +17,15 @@ are ignored. Note the line does not need to match fully to the format - it may h
 
 Hex-encoded data must be prefixed with `0x` for visual distinction from decimal numbers. If number formatting is not explicitly specified, decimal encoding must be used. The format also uses hex encoding for large data blobs, despite these being larger than e.g. base64, to allow simpler sub-blob searches (e.g. a particular constant value can be searched in read/written memory blobs).
 
-### Context log lines (optional)
+### Comment lines (optional)
 
-Implementations are encouraged to prepend any number of context lines, 
-which should contain:
+Comment lines may appear anywhere in the trace file. They are typically used to record:
 1. Implementation metadata (e.g. implementation/pvm version, build hash, etc)
 2. Execution environment (e.g. protocol parameters set (tiny/full), host call environment (refine, accumulate, etc))
+3. Semantic details about the host call (name, changes, etc)
 
-Each context line must start with `context` keyword and everything following is treated as part of the context.
+Each comment line must start with the `comment` keyword and everything following is treated as the comment content. Note that for textual comparison
+of two traces originating from different implementations comments are best stripped out.
 
 ### Required prelude
 
@@ -134,12 +135,12 @@ HALT pc={pc} gas={gas} {register-dump}
 
 ## Example
 
-TODO: use real-world example
+Simplified synthetic example of the syntax. Note it's not semantically correct, hence it cannot be replayed.
 
 ```
-context implementation typeberry 0.8.3
-context chain-id fluffy-testnet
-context accumulate
+comment implementation typeberry 0.8.3
+comment chain-id fluffy-testnet
+comment accumulate
 program 0x0102aabbccddeeff
 memwrite 0x00001000 len=8 <- 0x0000000000000001
 start pc=0 gas=10000 r07=0x10 r09=0x10000
@@ -154,3 +155,19 @@ setgas <- 9950
 
 HALT pc=42 gas=9920 r00=0x100 r02=0x4
 ```
+
+More examples can be found in [JAM Ecalli Trace](https://github.com/fluffylabs/jam-ecalli-trace) repository.
+
+
+## Tooling support
+
+[Anan-as PVM](https://github.com/tomusdrw/anan-as) already supports replaying trace files.
+
+```
+# Replay an ecalli trace
+npx @fluffylabs/anan-as replay-trace trace.log
+```
+
+It is also possible to load the trace files in [PVM Debugger](https://pvm.fluffylabs.dev/) and replay the execution.
+
+

@@ -5,7 +5,7 @@ import type {
   RegisterDump,
   SetReg,
   TerminationKind,
-} from "./types.ts";
+} from "./types.js";
 
 function bytesToHex(bytes: Uint8Array): string {
   let hex = "0x";
@@ -54,9 +54,9 @@ function formatTerminationKind(kind: TerminationKind): string {
 export function encode(trace: EcalliTrace): string {
   const lines: string[] = [];
 
-  // Context lines
-  for (const ctx of trace.contextLines) {
-    lines.push(`context ${ctx}`);
+  // Comment lines
+  for (const c of trace.comments) {
+    lines.push(`comment ${c}`);
   }
 
   // Program

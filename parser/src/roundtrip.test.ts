@@ -1,13 +1,13 @@
 import { describe, expect, it } from "bun:test";
-import { parse } from "./parser.ts";
-import { encode } from "./encoder.ts";
+import { parse } from "./parser.js";
+import { encode } from "./encoder.js";
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 
 const SPEC_EXAMPLE = `\
-context implementation typeberry 0.8.3
-context chain-id fluffy-testnet
-context accumulate
+comment implementation typeberry 0.8.3
+comment chain-id fluffy-testnet
+comment accumulate
 program 0x0102aabbccddeeff
 memwrite 0x00001000 len=8 <- 0x0000000000000001
 start pc=0 gas=10000 r07=0x10 r09=0x10000
@@ -27,7 +27,7 @@ describe("parser", () => {
   it("parses the spec example", () => {
     const trace = parse(SPEC_EXAMPLE);
 
-    expect(trace.contextLines).toEqual([
+    expect(trace.comments).toEqual([
       "implementation typeberry 0.8.3",
       "chain-id fluffy-testnet",
       "accumulate",
@@ -102,13 +102,13 @@ OOG pc=10 gas=0
 
   it("handles lines with prefix (e.g. TRACE logger)", () => {
     const input = `\
-TRACE [  ecalli] context my-impl v2
+TRACE [  ecalli] comment my-impl v2
 TRACE [  ecalli] program 0xaabb
 TRACE [  ecalli] start pc=5 gas=100 r00=0x1
 TRACE [  ecalli] HALT pc=10 gas=50
 `;
     const trace = parse(input);
-    expect(trace.contextLines).toEqual(["my-impl v2"]);
+    expect(trace.comments).toEqual(["my-impl v2"]);
     expect(trace.program).toEqual(new Uint8Array([0xaa, 0xbb]));
     expect(trace.start.pc).toBe(5);
     expect(trace.start.registers.get(0)).toBe(1n);
@@ -119,14 +119,14 @@ TRACE [  ecalli] HALT pc=10 gas=50
     const input = `\
 restarting service
 programming notes
-context my-impl v1
+comment my-impl v1
 program 0xaabb
 start pc=0 gas=100
 HALT pc=5 gas=50
 `;
     const trace = parse(input);
     // "restarting" and "programming" should be ignored, not matched as "start"/"program"
-    expect(trace.contextLines).toEqual(["my-impl v1"]);
+    expect(trace.comments).toEqual(["my-impl v1"]);
     expect(trace.program).toEqual(new Uint8Array([0xaa, 0xbb]));
     expect(trace.start.pc).toBe(0);
   });
@@ -359,7 +359,7 @@ describe("roundtrip with real trace files", () => {
     );
     const trace = parse(content);
 
-    // After parsing, context lines should not contain the prefix
+    // After parsing, comment lines should not contain the prefix
     // since they're lines before program that don't match keywords
     expect(trace.program.length).toBeGreaterThan(0);
     expect(trace.ecallis.length).toBeGreaterThan(0);

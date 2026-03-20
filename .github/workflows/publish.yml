@@ -1,0 +1,52 @@
+name: Test & Publish
+
+on:
+  push:
+    branches: [main]
+  release:
+    types: [published]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: parser
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
+      - run: bun test
+
+  publish:
+    needs: test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: parser
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install
+      - run: bun run build
+
+      - name: Set version (next)
+        if: github.event_name == 'push'
+        run: npm version "0.0.0-next.${GITHUB_SHA::7}" --no-git-tag-version
+
+      - name: Set version (release)
+        if: github.event_name == 'release'
+        run: npm version "${GITHUB_REF_NAME#v}" --no-git-tag-version
+
+      - name: Setup npm auth
+        run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish (next)
+        if: github.event_name == 'push'
+        run: npm publish --tag next --access public
+
+      - name: Publish (latest)
+        if: github.event_name == 'release'
+        run: npm publish --tag latest --access public

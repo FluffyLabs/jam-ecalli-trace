@@ -1,5 +1,5 @@
-export { parse } from "./parser.ts";
-export { encode } from "./encoder.ts";
+export { parse } from "./parser.js";
+export { encode } from "./encoder.js";
 export type {
   EcalliTrace,
   EcalliEntry,
@@ -10,4 +10,4 @@ export type {
   RegisterDump,
   Termination,
   TerminationKind,
-} from "./types.ts";
+} from "./types.js";

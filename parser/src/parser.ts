@@ -5,7 +5,7 @@ import type {
   RegisterDump,
   Termination,
   TerminationKind,
-} from "./types.ts";
+} from "./types.js";
 
 function hexToBytes(hex: string): Uint8Array {
   const clean = hex.startsWith("0x") ? hex.slice(2) : hex;
@@ -45,7 +45,7 @@ function parseKeyValue(token: string): [string, string] | null {
  * Returns the matched content or null if line doesn't contain a known keyword.
  */
 const KEYWORDS = [
-  "context",
+  "comment",
   "program",
   "memwrite",
   "memread",
@@ -81,7 +81,7 @@ function extractKnownLine(line: string): string | null {
 
 export function parse(input: string): EcalliTrace {
   const lines = input.split("\n");
-  const contextLines: string[] = [];
+  const comments: string[] = [];
   let program: Uint8Array | null = null;
   const initialMemWrites: MemWrite[] = [];
   let start: EcalliTrace["start"] | null = null;
@@ -101,8 +101,8 @@ export function parse(input: string): EcalliTrace {
     const tokens = extracted.split(" ");
     const first = tokens[0]!;
 
-    if (first === "context") {
-      contextLines.push(tokens.slice(1).join(" "));
+    if (first === "comment") {
+      comments.push(tokens.slice(1).join(" "));
       continue;
     }
 
@@ -268,7 +268,7 @@ export function parse(input: string): EcalliTrace {
   }
 
   return {
-    contextLines,
+    comments,
     program,
     initialMemWrites,
     start,

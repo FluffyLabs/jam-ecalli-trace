@@ -1,12 +1,30 @@
 {
   "name": "ecalli-trace-parser",
-  "module": "index.ts",
+  "version": "0.0.1",
+  "description": "Parser and encoder for the PVM Ecalli Trace format",
   "type": "module",
-  "private": true,
-  "devDependencies": {
-    "@types/bun": "latest"
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
   },
-  "peerDependencies": {
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "test": "bun test"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FluffyLabs/jam-ecalli-trace.git",
+    "directory": "parser"
+  },
+  "keywords": ["pvm", "ecalli", "trace", "jam", "parser"],
+  "devDependencies": {
+    "@types/bun": "latest",
     "typescript": "^5"
   }
 }

@@ -51,8 +51,8 @@ export interface Termination {
 
 /** A complete ecalli trace */
 export interface EcalliTrace {
-  /** Optional context lines (implementation metadata, etc.) */
-  contextLines: string[];
+  /** Optional comment lines (implementation metadata, etc.) */
+  comments: string[];
   /** The program blob (hex bytes) */
   program: Uint8Array;
   /** Initial memory writes (prelude) */

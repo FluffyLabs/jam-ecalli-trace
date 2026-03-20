@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
-import { parse } from "./src/parser.ts";
-import { encode } from "./src/encoder.ts";
+import { parse } from "./src/parser.js";
+import { encode } from "./src/encoder.js";
 
 const file = process.argv[2];
 if (!file) {
