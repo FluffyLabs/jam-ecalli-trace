@@ -21,12 +21,18 @@ jobs:
   publish:
     needs: test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     defaults:
       run:
         working-directory: parser
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v4
+        with:
+          registry-url: 'https://registry.npmjs.org'
       - run: bun install
       - run: bun run build
 
@@ -38,15 +44,10 @@ jobs:
         if: github.event_name == 'release'
         run: npm version "${GITHUB_REF_NAME#v}" --no-git-tag-version
 
-      - name: Setup npm auth
-        run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
       - name: Publish (next)
         if: github.event_name == 'push'
-        run: npm publish --tag next --access public
+        run: npm publish --provenance --tag next --access public
 
       - name: Publish (latest)
         if: github.event_name == 'release'
-        run: npm publish --tag latest --access public
+        run: npm publish --provenance --tag latest --access public

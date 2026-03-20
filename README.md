@@ -36,7 +36,7 @@ HALT pc=42 gas=9920 r00=0x100 r02=0x4
 ## Parser Usage
 
 ```typescript
-import { parse, encode } from "ecalli-trace-parser";
+import { parse, encode } from "@fluffylabs/ecalli-trace-parser";
 
 const trace = parse(traceFileContent);
 
