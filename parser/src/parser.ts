@@ -45,6 +45,7 @@ function parseKeyValue(token: string): [string, string] | null {
  * Returns the matched content or null if line doesn't contain a known keyword.
  */
 const KEYWORDS = [
+  "context",
   "program",
   "memwrite",
   "memread",
@@ -94,15 +95,16 @@ export function parse(input: string): EcalliTrace {
 
     const extracted = extractKnownLine(trimmed);
     if (extracted === null) {
-      // Only collect context lines before the program line
-      if (program === null) {
-        contextLines.push(trimmed);
-      }
       continue;
     }
 
     const tokens = extracted.split(" ");
     const first = tokens[0]!;
+
+    if (first === "context") {
+      contextLines.push(tokens.slice(1).join(" "));
+      continue;
+    }
 
     if (first === "program") {
       program = hexToBytes(tokens[1]!);

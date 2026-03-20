@@ -5,8 +5,8 @@ import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 
 const SPEC_EXAMPLE = `\
-implementation typeberry 0.8.3
-chain-id fluffy-testnet
+context implementation typeberry 0.8.3
+context chain-id fluffy-testnet
 context accumulate
 program 0x0102aabbccddeeff
 memwrite 0x00001000 len=8 <- 0x0000000000000001
@@ -30,7 +30,7 @@ describe("parser", () => {
     expect(trace.contextLines).toEqual([
       "implementation typeberry 0.8.3",
       "chain-id fluffy-testnet",
-      "context accumulate",
+      "accumulate",
     ]);
     expect(trace.program).toEqual(new Uint8Array([0x01, 0x02, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff]));
     expect(trace.initialMemWrites).toHaveLength(1);
@@ -102,11 +102,13 @@ OOG pc=10 gas=0
 
   it("handles lines with prefix (e.g. TRACE logger)", () => {
     const input = `\
+TRACE [  ecalli] context my-impl v2
 TRACE [  ecalli] program 0xaabb
 TRACE [  ecalli] start pc=5 gas=100 r00=0x1
 TRACE [  ecalli] HALT pc=10 gas=50
 `;
     const trace = parse(input);
+    expect(trace.contextLines).toEqual(["my-impl v2"]);
     expect(trace.program).toEqual(new Uint8Array([0xaa, 0xbb]));
     expect(trace.start.pc).toBe(5);
     expect(trace.start.registers.get(0)).toBe(1n);
@@ -117,13 +119,14 @@ TRACE [  ecalli] HALT pc=10 gas=50
     const input = `\
 restarting service
 programming notes
+context my-impl v1
 program 0xaabb
 start pc=0 gas=100
 HALT pc=5 gas=50
 `;
     const trace = parse(input);
-    // "restarting" and "programming" should be context lines, not matched as "start"/"program"
-    expect(trace.contextLines).toEqual(["restarting service", "programming notes"]);
+    // "restarting" and "programming" should be ignored, not matched as "start"/"program"
+    expect(trace.contextLines).toEqual(["my-impl v1"]);
     expect(trace.program).toEqual(new Uint8Array([0xaa, 0xbb]));
     expect(trace.start.pc).toBe(0);
   });

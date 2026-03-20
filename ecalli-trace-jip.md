@@ -24,6 +24,8 @@ which should contain:
 1. Implementation metadata (e.g. implementation/pvm version, build hash, etc)
 2. Execution environment (e.g. protocol parameters set (tiny/full), host call environment (refine, accumulate, etc))
 
+Each context line must start with `context` keyword and everything following is treated as part of the context.
+
 ### Required prelude
 
 The first mandatory log line must contain the program blob being executed, including metadata (if any). In JAM context this will be the service's code hash preimage value.
@@ -135,8 +137,8 @@ HALT pc={pc} gas={gas} {register-dump}
 TODO: use real-world example
 
 ```
-implementation typeberry 0.8.3
-chain-id fluffy-testnet
+context implementation typeberry 0.8.3
+context chain-id fluffy-testnet
 context accumulate
 program 0x0102aabbccddeeff
 memwrite 0x00001000 len=8 <- 0x0000000000000001

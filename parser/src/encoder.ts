@@ -56,7 +56,7 @@ export function encode(trace: EcalliTrace): string {
 
   // Context lines
   for (const ctx of trace.contextLines) {
-    lines.push(ctx);
+    lines.push(`context ${ctx}`);
   }
 
   // Program
