@@ -38,7 +38,9 @@ jobs:
 
       - name: Set version (next)
         if: github.event_name == 'push'
-        run: npm version "0.0.0-next.${GITHUB_SHA::7}" --no-git-tag-version
+        run: |
+          BASE=$(node -p "require('./package.json').version")
+          npm version "${BASE}-next.${GITHUB_SHA::7}" --no-git-tag-version
 
       - name: Set version (release)
         if: github.event_name == 'release'
